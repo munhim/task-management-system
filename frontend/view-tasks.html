@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>All Tasks | Task Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #121212, #1a1a1a);
+            color: #E0E0E0;
+            min-height:100vh;
+            position: relative; /* Needed for absolute positioning of footer */
+            padding-bottom: 4rem; /* Add padding at the bottom for fixed footer */
+        }
+        .container { width:90%; max-width:1100px; margin:0 auto; display:flex;justify-content:space-between;align-items:center; }
+        header {
+            position:absolute; top:0; width:100%; background:#1F1F1F; padding:1rem 0;
+            box-shadow:0 2px 5px rgba(0,0,0,0.5);
+        }
+        header .container { justify-content:space-between; }
+        header h1 { color:#00BCD4; font-size:1.8rem; }
+        nav a {
+            color:#E0E0E0; text-decoration:none; margin:0 0.75rem; padding:0.5rem 1rem;
+            border-radius:4px; transition:background 0.3s;
+        }
+        nav a:hover, nav .active { background:#00BCD4; color:#121212; }
+
+        .tasks-section {
+            padding:6rem 0 4rem;
+            display:flex; flex-direction:column; align-items:center;
+        }
+        .tasks-section h2 {
+            margin-bottom:1.5rem; color:#00BCD4; font-size:2rem;
+        }
+        .tasks-container {
+            width:100%; max-width:800px;
+        }
+        .task-card {
+            background:#1E1E1E; margin-bottom:1rem; padding:1rem 1.5rem;
+            border-radius:6px; box-shadow:0 4px 8px rgba(0,0,0,0.7);
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Space between task info and button */
+            align-items: center; /* Vertically center items */
+        }
+        .task-card h3 { margin-bottom:0.5rem; color:#ff4081; }
+        .task-card p { font-size:0.95rem; color:#B0B0B0; margin-bottom:0.25rem; }
+        .task-card .due {
+            font-size:0.85rem; color:#888; margin-top:0.5rem;
+        }
+
+        .mark-done-button {
+            padding: 0.5rem 1rem;
+            background: #00BCD4;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .mark-done-button:hover {
+            background: #0097a7;
+        }
+
+        footer {
+            position: absolute; bottom:0; width:100%; background:#1F1F1F;
+            color:#888; text-align:center; padding:1rem 0;
+        }
+
+        .back-button {
+            padding: 0.75rem 1.5rem;
+            background: #00BCD4;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+            align-self: center; /* Center the button */
+        }
+        .back-button:hover {
+            background: #0097a7;
+        }
+
+        @media (max-width:480px) {
+            .tasks-section h2 { font-size:1.5rem; }
+             .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .mark-done-button {
+                margin-top: 1rem;
+                align-self: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Task Management</h1>
+            <nav>
+            <a href="homo.html">Home</a>
+            <a href="add-task.html">Add Task</a>
+            <a href="view-tasks.html" class="active">View Tasks</a>
+            <a href="index.html" class="back-button-nav">Logout</a>
+            </nav>
+        </div>
+        </header>
+
+    <main class="tasks-section">
+        <h2>All Your Tasks</h2>
+        <div class="tasks-container" id="tasks-container">
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Task Management. All rights reserved.</p>
+    </footer>
+
+    <script>
+        async function loadTasks() {
+            const container = document.getElementById('tasks-container');
+            try {
+                const res = await fetch('http://localhost:3001/tasks');
+                const tasks = await res.json();
+                if (!Array.isArray(tasks)) throw new Error();
+                tasks.forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = 'task-card';
+                    card.innerHTML = `
+                        <div>
+                            <h3>${t.title}</h3>
+                            <p>${t.description}</p>
+                            <p class="due">Due: ${new Date(t.dueDate).toLocaleDateString()}</p>
+                         </div>
+                    `;
+                    const doneButton = document.createElement('button');
+                    doneButton.className = 'mark-done-button';
+                    doneButton.textContent = 'Mark as Done';
+                    doneButton.dataset.taskId = t._id;  // Store the task ID
+                    doneButton.addEventListener('click', markTaskDone);
+                    card.appendChild(doneButton);
+                    container.appendChild(card);
+                });
+            } catch {
+                container.innerHTML = '<p style="text-align:center;color:#ff4081;">Failed to load tasks.</p>';
+            }
+        }
+
+        async function markTaskDone(event) {
+            const taskId = event.target.dataset.taskId;
+            try {
+                const res = await fetch(`http://localhost:3001/tasks/${taskId}`, {
+                    method: 'PUT',
+                    body:JSON.stringify({status:"done"})          
+                      });
+                if (!res.ok) throw new Error('Failed to mark task as done');
+                // Remove the task card from the UI
+                event.target.closest('.task-card').remove();
+                alert('Task marked as done!');
+
+            } catch (error) {
+                alert('Error marking task as done.');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadTasks);
+    </script>
+</body>
+</html>

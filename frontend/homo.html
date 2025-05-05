@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #121212, #1a1a1a);
+            color: #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: #00BCD4;
+            font-size: 3rem;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-container a {
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(to bottom, #00BCD4, #00869e);
+            color: #121212;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex; /* Use flexbox for icon alignment */
+            align-items: center; /* Vertically center icon and text */
+            gap: 10px; /* Space between icon and text */
+            min-width: 160px;
+            justify-content: center; /* keep the text centered */
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to bottom, #00c6db, #007185);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            background: linear-gradient(to bottom, #00869e, #00bcd4);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            transform: translateY(0);
+        }
+
+        /* Icon Styles */
+        .icon {
+            width: 24px; /* Icon size */
+            height: 24px;
+            /* You can use an SVG or a font icon library like Font Awesome */
+            /* Example (using a simple square as a placeholder): */
+             background-color: #121212; 
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E");
+            mask-size: cover;
+            display: inline-block;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <h1>Task Management Dashboard</h1>
+
+    <div class="btn-container">
+        <a href="add-task.html">
+            <button class="btn-primary">
+                <span class="icon"></span> Add Task
+            </button>
+        </a>
+        <a href="delete-task.html">
+            <button class="btn-primary">
+                <span class="icon"></span> Delete Task
+            </button>
+        </a>
+        <a href="view-tasks.html">
+            <button class="btn-primary">
+               <span class="icon"></span> View Tasks
+            </button>
+        </a>
+        <a href="notifications.html">
+            <button class="btn-primary">
+                <span class="icon"></span> View Notifications
+            </button>
+        </a>
+    </div>
+
+</body>
+</html>
