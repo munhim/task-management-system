@@ -1,113 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Notifications | Task Management</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body {
-      font-family:'Roboto',sans-serif;
-      background:linear-gradient(135deg,#121212,#1a1a1a);
-      color:#E0E0E0;
-      min-height:100vh;
-    }
-    .container {
-      width:90%;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;
-    }
-    header {
-      position:fixed;top:0;width:100%;background:#1F1F1F;padding:1rem 0;
-      box-shadow:0 2px 5px rgba(0,0,0,0.5);
-    }
-    header .container {justify-content:space-between;}
-    header h1 {color:#00BCD4;font-size:1.8rem;}
-    nav a {
-      color:#E0E0E0;text-decoration:none;margin:0 0.75rem;padding:0.5rem 1rem;border-radius:4px;
-      transition:background 0.3s;
-    }
-    nav a:hover, nav .active {background:#00BCD4;color:#121212;}
-
-    main {
-      padding:6rem 0 4rem;
-      display:flex;flex-direction:column;align-items:center;
-    }
-    main h2 {
-      color:#00BCD4;margin-bottom:1rem;font-size:2rem;
-    }
-    .notes {
-      width:100%;max-width:800px;
-    }
-    .note-card {
-      background:#1E1E1E;margin-bottom:1rem;padding:1rem 1.5rem;
-      border-radius:6px;box-shadow:0 4px 8px rgba(0,0,0,0.7);
-    }
-    .note-card h4 {margin-bottom:0.5rem;color:#FF4081;}
-    .note-card p {font-size:0.95rem;color:#B0B0B0;margin-bottom:0.25rem;}
-    .note-card .time {
-      font-size:0.85rem;color:#888;margin-top:0.5rem;
-    }
-    footer {
-      position:fixed;bottom:0;width:100%;background:#1F1F1F;color:#888;text-align:center;padding:1rem 0;
-    }
-
-    @media(max-width:480px){
-      main h2{font-size:1.5rem;}
-      .note-card{padding:0.75rem 1rem;}
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header>
-    <div class="container">
-      <h1>Task Management</h1>
-      <nav>
-        <a href="homo.html">Home</a>
-        <a href="add-task.html">Add Task</a>
-        <a href="view-tasks.html">View Tasks</a>
-        <a href="notifications.html" class="active">Notifications</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <h2>Notifications</h2>
-    <div class="notes" id="notes"></div>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Task Management. All rights reserved.</p>
-  </footer>
+  <div class="container">
+    <header><h1>Notifications</h1></header>
+    <nav>
+      <a href="view-tasks.html">Back to Tasks</a>
+    </nav>
+    <div class="card notification-list" id="notifications"></div>
+  </div>
 
   <script>
-    async function loadNotifications() {
-      const container = document.getElementById('notes');
-      container.innerHTML = '<p style="text-align:center;color:#888;">Loading…</p>';
-      try {
-        const res = await fetch('http://localhost:3002/notifications');
-        const notes = await res.json();
-        container.innerHTML = '';
-        if (!Array.isArray(notes) || !notes.length) {
-          container.innerHTML = '<p style="text-align:center;color:#888;">No notifications yet.</p>';
-          return;
-        }
-        notes.forEach(n => {
-          const card = document.createElement('div');
-          card.className = 'note-card';
-          card.innerHTML = `
-            <h4>Task ID: ${n.taskId}</h4>
-            <p>${n.message}</p>
-            <p class="time">${new Date(n.createdAt).toLocaleString()}</p>
-          `;
-          container.appendChild(card);
-        });
-      } catch {
-        container.innerHTML = '<p style="text-align:center;color:#ff4081;">Failed to load notifications.</p>';
-      }
-    }
-    window.addEventListener('DOMContentLoaded', loadNotifications);
-  </script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
 
+    async function loadNotifs() {
+      // extract userId from JWT payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const res = await fetch(`http://localhost:3002/notifications?userId=${payload.userId}`);
+      const notifs = await res.json();
+      const container = document.getElementById('notifications');
+      container.innerHTML = '';
+      notifs.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'notification-item';
+        div.textContent = `[${new Date(n.createdAt).toLocaleTimeString()}] ${n.message}`;
+        container.appendChild(div);
+      });
+    }
+
+    loadNotifs();
+  </script>
 </body>
 </html>

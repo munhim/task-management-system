@@ -1,165 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up | Task Management</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    /* --- Reset & Base --- */
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #121212, #1a1a1a);
-      color: #E0E0E0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    /* --- Card Container --- */
-    .signup-card {
-      background: #1E1E1E;
-      padding: 2rem;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
-      text-align: center;
-    }
-    .signup-card h2 {
-      color: #00BCD4;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem;
-    }
-
-    /* --- Form --- */
-    .form-group {
-      margin-bottom: 1rem;
-      text-align: left;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #B0B0B0;
-      font-size: 0.9rem;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 4px;
-      background: #292929;
-      color: #E0E0E0;
-      font-size: 1rem;
-      transition: border 0.3s;
-    }
-    .form-group input:focus {
-      outline: none;
-      border: 2px solid #00BCD4;
-    }
-
-    /* --- Button --- */
-    .btn-primary {
-      width: 100%;
-      padding: 0.75rem;
-      background: #00BCD4;
-      color: #121212;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.3s;
-      margin-top: 0.5rem;
-    }
-    .btn-primary:hover {
-      background: #0097a7;
-    }
-
-    /* --- Footer Link --- */
-    .text-center {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #B0B0B0;
-    }
-    .text-center a {
-      color: #00BCD4;
-      text-decoration: none;
-    }
-    .text-center a:hover {
-      text-decoration: underline;
-    }
-
-    /* --- Responsive --- */
-    @media (max-width: 480px) {
-      .signup-card {
-        padding: 1.5rem;
-      }
-      .signup-card h2 {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="signup-card">
-    <h2>Create Your Account</h2>
-    <form id="signup-form">
-      <div class="form-group">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" placeholder="Jane Doe" required/>
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="jane@example.com" required/>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required/>
-      </div>
-      <div class="form-group">
-        <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" placeholder="••••••••" required/>
-      </div>
-      <button type="submit" class="btn-primary">Sign Up</button>
-    </form>
-    <p class="text-center">
-      Already have an account? <a href="login.html">Login here</a>
-    </p>
+  <div class="container">
+    <div class="card">
+      <h1>Sign Up</h1>
+      <form id="signup-form">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Create Account</button>
+      </form>
+      <p>Already have an account? <a href="login.html">Login</a></p>
+    </div>
   </div>
 
   <script>
-    document.getElementById('signup-form').addEventListener('submit', function (e) {
+    const form = document.getElementById('signup-form');
+    form.addEventListener('submit', async e => {
       e.preventDefault();
-  
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-  
-      fetch('http://localhost:3000/users/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert(data.message);
-            window.location.href = 'login.html'; // Redirect to login
-          } else {
-            alert('Error: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Fetch error:', error);
-          alert('Something went wrong. Please try again later.');
-        });
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch('http://localhost:3000/signup', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const { token } = await res.json();
+      localStorage.setItem('token', token);
+      window.location.href = 'view-tasks.html';
     });
   </script>
-  
 </body>
 </html>

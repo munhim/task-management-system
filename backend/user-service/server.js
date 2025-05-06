@@ -1,56 +1,75 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
+const axios = require('axios');
 const bodyParser = require('body-parser');
-
 const app = express();
-app.use(cors()); // Enable CORS
+const cors = require('cors');
+
+// allow your frontend origin (or use `app.use(cors())` to allow all origins)
+app.use(cors());
+
 app.use(bodyParser.json());
 
-// MongoDB connection
-mongoose.connect('mongodb://mongo:27017/taskdb', {
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
+
+mongoose.connect('mongodb://localhost:27017/user-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// User schema
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  name: String,
+  email: { type: String, unique: true },
+  passwordHash: String,
 });
 const User = mongoose.model('User', userSchema);
 
-// Signup Route
-app.post('/users/signup', async (req, res) => {
+app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
-  if (!name || !email || !password)
-    return res.status(400).json({ success: false, message: 'All fields required' });
-
-  const exists = await User.findOne({ email });
-  if (exists)
-    return res.status(400).json({ success: false, message: 'User already exists' });
-
-  const hash = await bcrypt.hash(password, 10);
-  await User.create({ name, email, password: hash });
-
-  res.status(201).json({
-    success: true,
-    message: 'Account created successfully! Redirecting to login...',
-  });
+  if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = new User({ name, email, passwordHash });
+    await user.save();
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    // notify
+    axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
+      userId: user._id,
+      message: 'Welcome! You signed up.',
+      type: 'login',
+    }).catch(console.error);
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error creating user' });
+  }
 });
 
-// Login Route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ success: false, message: 'Invalid credentials' });
+  if (!email || !password) return res.status(400).json({ message: 'Missing fields' });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) return res.status(400).json({ message: 'Invalid credentials' });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    // notify
+    axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
+      userId: user._id,
+      message: 'You have successfully logged in.',
+      type: 'login',
+    }).catch(console.error);
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error logging in' });
   }
-  const token = jwt.sign({ id: user._id }, 'SUPER_SECRET_KEY', { expiresIn: '1h' });
-  res.json({ success: true, id:user._id });
 });
 
-app.listen(3000, () => console.log('User Service → http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`User service listening on port ${PORT}`));

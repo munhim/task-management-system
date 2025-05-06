@@ -1,78 +1,118 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const bodyParser = require('body-parser');
+
 const cors = require('cors');
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+// allow your frontend origin (or use `app.use(cors())` to allow all origins)
 
-mongoose.connect('mongodb://mongo:27017/taskdb', {
+const app = express();
+app.use(bodyParser.json());
+app.use(cors());
+
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
+
+mongoose.connect('mongodb://localhost:27017/task-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Task schema
 const taskSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  userId: mongoose.Schema.Types.ObjectId,
+  title: String,
   description: String,
-  status: { type: String, default: 'pending' },
-  dueDate: Date, // This will store the full date and time
-}, { timestamps: true });
-
+  deadline: Date,
+  status: { type: String, enum: ['pending', 'done'], default: 'pending' },
+});
 const Task = mongoose.model('Task', taskSchema);
 
-// Create
-app.post('/tasks', async (req, res) => {
+// auth middleware
+const auth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: 'Missing auth header' });
+  const token = authHeader.split(' ')[1];
   try {
-    const task = await Task.create(req.body);
-    res.status(201).json(task);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating task', error: error.message });
+    const { userId } = jwt.verify(token, JWT_SECRET);
+    req.userId = userId;
+    next();
+  } catch {
+    res.status(401).json({ message: 'Invalid token' });
   }
+};
+
+app.get('/tasks', auth, async (req, res) => {
+  const tasks = await Task.find({ userId: req.userId }).sort({ deadline: 1 });
+  res.json(tasks);
 });
 
-// Read all
-app.get('/tasks', async (req, res) => {
+app.post('/tasks', auth, async (req, res) => {
+  const { title, description, deadline } = req.body;
+  if (!title || !deadline) return res.status(400).json({ message: 'Title and deadline are required' });
   try {
-    const tasks = await Task.find();
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ message: 'Error reading tasks', error: error.message });
-  }
-});
-
-// Read one
-app.get('/tasks/:id', async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: 'Not found' });
-    res.json(task);
-  } catch (error) {
-    res.status(500).json({ message: 'Error reading task', error: error.message });
-  }
-});
-
-// Update
-app.put('/tasks/:id', async (req, res) => {
-  try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    const task = new Task({
+      userId: req.userId,
+      title,
+      description,
+      deadline: new Date(deadline),
     });
+    await task.save();
     res.json(task);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating task', error: error.message });
+    // notify creation
+    axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
+      userId: req.userId,
+      message: `Task created: ${title}`,
+      type: 'task_created',
+      taskId: task._id,
+    }).catch(console.error);
+    // schedule deadline reminder
+    const now = new Date();
+    const remindAt = new Date(task.deadline.getTime() - 60 * 60 * 1000);
+    const ms = remindAt.getTime() - now.getTime();
+    if (ms > 0) {
+      setTimeout(() => {
+        axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
+          userId: req.userId,
+          message: `Deadline approaching for task: ${title}`,
+          type: 'deadline',
+          taskId: task._id,
+        }).catch(console.error);
+      }, ms);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error creating task' });
   }
 });
 
-// Delete
-app.delete('/tasks/:id', async (req, res) => {
+app.put('/tasks/:id/done', auth, async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.sendStatus(204);
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting task', error: error.message });
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      { status: 'done' },
+      { new: true }
+    );
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    res.json(task);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error marking task done' });
   }
 });
 
-app.listen(3001, () => console.log('Task Service → http://localhost:3001'));
+app.delete('/tasks/:id', auth, async (req, res) => {
+  try {
+    const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+    res.json({ message: 'Task deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error deleting task' });
+  }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Task service listening on port ${PORT}`));

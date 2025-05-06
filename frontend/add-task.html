@@ -1,144 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Create Task | Task Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"/>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #121212, #1a1a1a);
-            color: #E0E0E0;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh;
-        }
-        .container { width:90%; max-width:1100px; margin:0 auto; display:flex;justify-content:space-between;align-items:center; }
-        header {
-            position:absolute; top:0; width:100%; background:#1F1F1F; padding:1rem 0;
-            box-shadow:0 2px 5px rgba(0,0,0,0.5);
-        }
-        header .container { justify-content:space-between; }
-        header h1 { color:#00BCD4; font-size:1.8rem; }
-        nav a {
-            color:#E0E0E0; text-decoration:none; margin:0 0.75rem; padding:0.5rem 1rem;
-            border-radius:4px; transition:background 0.3s;
-        }
-        nav a:hover, nav .active { background:#00BCD4; color:#121212; }
-
-        .auth-section {
-            width:100%; padding-top:6rem;
-            display:flex; justify-content:center; align-items:flex-start;
-        }
-        .auth-card {
-            background:#1E1E1E; padding:2rem; border-radius:8px;
-            width:100%; max-width:400px; box-shadow:0 4px 10px rgba(0,0,0,0.7);
-            text-align:center;
-        }
-        .auth-card h2 { color:#00BCD4; margin-bottom:1.5rem; font-size:1.8rem; }
-
-        .form-group { margin-bottom:1rem; text-align:left; }
-        .form-group label {
-            display:block; margin-bottom:0.5rem; color:#B0B0B0; font-size:0.9rem;
-        }
-        .form-group input,
-        .form-group textarea {
-            width:100%; padding:0.75rem 1rem; border:none; border-radius:4px;
-            background:#292929; color:#E0E0E0; font-size:1rem;
-            transition:border 0.3s;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline:none; border:2px solid #00BCD4;
-        }
-
-        .btn-primary {
-            width:100%; padding:0.75rem; background:#00BCD4; color:#121212;
-            border:none; border-radius:4px; font-size:1rem; font-weight:500;
-            cursor:pointer; transition:background 0.3s; margin-top:0.5rem;
-        }
-        .btn-primary:hover { background:#0097a7; }
-
-        .text-center {
-            margin-top:1rem; font-size:0.9rem; color:#B0B0B0;
-        }
-        .text-center a { color:#00BCD4; text-decoration:none; }
-        .text-center a:hover { text-decoration:underline; }
-
-        footer {
-            position:absolute; bottom:0; width:100%; text-align:center;
-            padding:1rem 0; background:#1F1F1F; color:#888;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Task</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-          <h1>Task Management</h1>
-          <nav>
-            <a href="homo.html">Home</a>
-            <a href="add-task.html">Add Task</a>
-            <a href="view-tasks.html" class="active">View Tasks</a>
-            <a href="index.html" class="back-button-nav">Logout</a>
-          </nav>
-        </div>
-      </header>
+  <div class="container">
+    <header><h1>Add New Task</h1></header>
+    <nav>
+      <a href="view-tasks.html">Back to Tasks</a>
+    </nav>
+    <div class="card">
+      <form id="task-form">
+        <input type="text" name="title" placeholder="Title" required>
+        <textarea name="description" placeholder="Description"></textarea>
+        <input type="datetime-local" name="deadline" required>
+        <button type="submit">Create Task</button>
+      </form>
+    </div>
+  </div>
 
-    <main class="auth-section">
-        <div class="auth-card">
-            <h2>Create New Task</h2>
-            <form id="task-form">
-                <div class="form-group">
-                    <label for="title">Title</label>
-                    <input type="text" id="title" placeholder="Task title" required/>
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" rows="3" placeholder="Describe the task" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="due-date">Due Date and Time</label>
-                    <input type="datetime-local" id="due-date" required/>
-                </div>
-                <button type="submit" class="btn-primary">Add Task</button>
-            </form>
-            <p class="text-center">
-                <a href="view-tasks.html">View All Tasks</a>
-            </p>
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Task Management. All rights reserved.</p>
-    </footer>
-
-    <script>
-        const token = localStorage.getItem('token');
-        console.log(token);
-        document.getElementById('task-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const dueDateValue = document.getElementById('due-date').value;
-
-            const payload = {
-                title: e.target.title.value,
-                description: e.target.description.value,
-                dueDate: dueDateValue
-            };
-            try {
-                const res = await fetch('http://localhost:3001/tasks', {
-                    method:'POST',
-                    headers:{ 'Content-Type':'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if(!res.ok) throw new Error('Failed');
-                alert('Task added!');
-                e.target.reset();
-                window.location.href = 'homo.html';
-            } catch(err) {
-                alert('Error adding task.');
-            }
-        });
-    </script>
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+  
+    const form = document.getElementById('task-form');
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+  
+      // grab each field explicitly
+      const title       = form.elements.title.value.trim();
+      const description = form.elements.description.value.trim();
+      const deadline    = form.elements.deadline.value; 
+      // (deadline is already in the ISO‑ish string format datetime-local uses)
+  
+      // build a plain JSON object
+      const payload = { title, description, deadline };
+  
+      const res = await fetch('http://localhost:3001/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)    // direct JSON string
+      });
+  
+      if (!res.ok) {
+        const err = await res.json();
+        return alert('Error: ' + (err.message || res.statusText));
+      }
+  
+      // on success, go back to task list
+      window.location.href = 'view-tasks.html';
+    });
+  </script>
+  
 </body>
-</html>
