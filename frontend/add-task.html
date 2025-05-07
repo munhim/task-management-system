@@ -14,48 +14,68 @@
     </nav>
     <div class="card">
       <form id="task-form">
-        <input type="text" name="title" placeholder="Title" required>
-        <textarea name="description" placeholder="Description"></textarea>
-        <input type="datetime-local" name="deadline" required>
+        <div class="input-group">
+          <input type="text" name="title" placeholder="Title" required>
+        </div>
+        <div class="input-group">
+          <textarea name="description" placeholder="Description" required></textarea>
+        </div>
+        <div class="input-group">
+          <input type="datetime-local" name="deadline" required>
+        </div>
         <button type="submit">Create Task</button>
       </form>
     </div>
   </div>
 
   <script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = 'login.html';
-  
     const form = document.getElementById('task-form');
     form.addEventListener('submit', async e => {
       e.preventDefault();
   
-      // grab each field explicitly
       const title       = form.elements.title.value.trim();
       const description = form.elements.description.value.trim();
-      const deadline    = form.elements.deadline.value; 
-      // (deadline is already in the ISO‑ish string format datetime-local uses)
+      const deadline    = form.elements.deadline.value;
   
-      // build a plain JSON object
-      const payload = { title, description, deadline };
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert("User not logged in.");
+        return;
+      }
+  
+      const payload = { userId, title, description, deadline };
   
       const res = await fetch('http://localhost:3001/tasks', {
         method: 'POST',
         headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + token
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)    // direct JSON string
+        body: JSON.stringify(payload)
       });
   
       if (!res.ok) {
         const err = await res.json();
         return alert('Error: ' + (err.message || res.statusText));
       }
+
+      const moni=res.json();
   
-      // on success, go back to task list
+      await fetch('http://localhost:3002/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          message: `Task created: ${title}`,
+          type: 'task_created',
+          taskId: moni.taskId,
+        })
+      }).catch(console.error);
+  
+
+
       window.location.href = 'view-tasks.html';
     });
   </script>
   
 </body>
+</html>

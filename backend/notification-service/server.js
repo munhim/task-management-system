@@ -8,7 +8,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-mongoose.connect('mongodb://localhost:27017/notification-service', {
+mongoose.connect('mongodb://mongodb:27017/notification-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

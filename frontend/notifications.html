@@ -16,13 +16,14 @@
   </div>
 
   <script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = 'login.html';
-
+    const userId = localStorage.getItem('userId');
     async function loadNotifs() {
-      // extract userId from JWT payload
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const res = await fetch(`http://localhost:3002/notifications?userId=${payload.userId}`);
+      const res = await fetch(`http://localhost:3002/notifications?userId=${userId}`);
+      if (!res.ok) {
+        alert('Failed to load notifications');
+        return;
+      }
+      
       const notifs = await res.json();
       const container = document.getElementById('notifications');
       container.innerHTML = '';

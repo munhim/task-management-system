@@ -1,10 +1,12 @@
 :root {
-  --primary-color: #5c6bc0;
-  --accent-color: #ffca28;
-  --bg-color: #f4f6f8;
-  --text-color: #333;
-  --card-bg: #fff;
-  --radius: 8px;
+  --primary-color: #00bcd4;
+  --accent-color: #ffc107;
+  --bg-color: #1e1e2f;
+  --text-color: #e0e0e0;
+  --card-bg: #2c2c3c;
+  --radius: 10px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -18,88 +20,233 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0 20px; /* Added padding for responsive design */
 }
 
 .container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 0 20px;
+  max-width: 900px;
+  width: 100%;
+  padding: 40px 30px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
 }
 
 header {
-  text-align: center;
   margin-bottom: 30px;
 }
 
 h1 {
+  font-size: 2.8rem;
   color: var(--primary-color);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  font-weight: 400;
+  opacity: 0.8;
 }
 
 nav {
-  text-align: center;
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 30px; /* Space between links */
 }
 
 nav a {
-  color: var(--primary-color);
-  margin: 0 10px;
+  color: var(--accent-color);
+  background-color: transparent;
+  border: 2px solid var(--accent-color);
+  padding: 12px 24px;
+  border-radius: var(--radius);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  cursor: pointer;
 }
 
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin-bottom: 20px;
+nav a:hover {
+  background-color: var(--accent-color);
+  color: #000;
+  transform: translateY(-3px); /* Slight lift effect */
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-input, textarea, button, select {
-  padding: 12px 16px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: var(--radius);
-  font-size: 1rem;
+nav a:active {
+  transform: translateY(1px); /* Button pressed effect */
 }
 
 button {
-  background: var(--primary-color);
-  color: #fff;
+  background-color: var(--accent-color);
+  color: #1e1e2f;
   border: none;
+  border-radius: var(--radius);
+  padding: 14px 22px;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
-  background: #3f51b5;
+  background-color: #ffd54f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-.task-list .task-item {
+button:active {
+  transform: translateY(1px);
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid #444;
+  background-color: #333;
+  color: var(--text-color);
+  font-size: 1rem;
+  margin-top: 8px;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: #444;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.2rem;
+}
+
+input[type="datetime-local"] {
+  background-color: #333;
+  border: 1px solid #444;
+}
+
+input[type="datetime-local"]:focus {
+  background-color: #444;
+}
+
+/* Specific Styles for Task List Page */
+.task-item {
+  background-color: #333;
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .task-item.done {
-  background: #e8f5e9;
-  text-decoration: line-through;
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.task-item span {
+  font-size: 1rem;
+  flex-grow: 1;
 }
 
 .task-item button {
   margin-left: 10px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  padding: 10px 18px;
+  font-size: 1rem;
+  border-radius: var(--radius);
+  background-color: #f44336;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
 }
 
-.notification-list .notification-item {
-  padding: 10px 0;
-  border-bottom: 1px solid #ddd;
+.task-item button:hover {
+  background-color: #e53935;
+  transform: translateY(-2px);
+}
+
+.task-item button:active {
+  transform: translateY(1px);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  padding: 14px;
+  margin: 12px 0;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  border-color: #00bcd4;
+  outline: none;
+  background-color: #444;
+}
+
+/* Notification List */
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Slightly increased gap for better spacing */
+}
+
+.notification-item {
+  background-color: red; /* Default red background */
+  color: var(--text-color);
+  border-radius: var(--radius);
+  padding: 12px;
+  font-size: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid #444;
+  cursor: pointer;
+  max-width: 320px; /* Adjusted for better layout */
+  word-wrap: break-word;
+  white-space: normal;
+  overflow: hidden;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.notification-item.clicked {
+  background-color: green; /* Turns green when clicked */
+}
+
+.notification-item:hover {
+  background-color: #ff4d4d; /* Lighter red when hovered */
+  transform: translateY(-2px); /* Slight lift on hover */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.notification-item:first-child {
+  margin-top: 12px;
 }

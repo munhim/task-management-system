@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const app = express();
@@ -12,11 +11,9 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:3002';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
-
-mongoose.connect('mongodb://localhost:27017/user-service', {
+mongoose.connect('mongodb://mongodb:27017/user-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -35,14 +32,17 @@ app.post('/signup', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({ name, email, passwordHash });
     await user.save();
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
     // notify
     axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
       userId: user._id,
       message: 'Welcome! You signed up.',
       type: 'login',
     }).catch(console.error);
-    res.json({ token });
+    res.status(200).json({
+      message: 'Login successful',
+      userId: user._id.toString() // send userId explicitly
+    });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error creating user' });
@@ -57,14 +57,11 @@ app.post('/login', async (req, res) => {
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return res.status(400).json({ message: 'Invalid credentials' });
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
-    // notify
-    axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
-      userId: user._id,
-      message: 'You have successfully logged in.',
-      type: 'login',
-    }).catch(console.error);
-    res.json({ token });
+    res.status(200).json({
+      message: 'Login successful',
+      userId: user._id.toString() // send userId explicitly
+    });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error logging in' });

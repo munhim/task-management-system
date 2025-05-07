@@ -1,14 +1,12 @@
-# Step 1: Use the official Nginx image to serve static files
+# Use an official Nginx image to serve the static files
 FROM nginx:alpine
-
-# Step 2: Remove the default nginx welcome page
-RUN rm /usr/share/nginx/html/*
-
-# Step 3: Copy your frontend files (HTML, CSS, JS) to the Nginx html directory
-COPY ./frontend /usr/share/nginx/html
-
-# Step 4: Expose the port that nginx will run on
-EXPOSE 80
-
-# Step 5: Run nginx (this is the default command for the nginx image)
+# Set the working directory inside the container
+WORKDIR /usr/share/nginx/html
+# Remove the default Nginx index.html
+RUN rm -rf ./*
+# Copy the frontend files to the Nginx container
+COPY ./ /usr/share/nginx/html
+# Expose the port Nginx will run on
+EXPOSE 5050
+# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]

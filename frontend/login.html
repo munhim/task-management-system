@@ -1,21 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>Login</h1>
+      <h1><i class="fa-solid fa-right-to-bracket"></i> Login</h1>
       <form id="login-form">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+        <div class="input-group">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" name="email" placeholder="Email" required />
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" name="password" placeholder="Password" required />
+        </div>
+        <button type="submit">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+        </button>
       </form>
-      <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+      <p style="margin-top: 10px;">
+        Don't have an account?
+        <a href="signup.html"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+      </p>
     </div>
   </div>
 
@@ -24,14 +42,53 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
+      
+      // Attempt login
       const res = await fetch('http://localhost:3000/login', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
       });
-      const { token } = await res.json();
-      localStorage.setItem('token', token);
-      window.location.href = 'view-tasks.html';
+  
+      // Check if login is successful
+      if (res.ok) {
+        const { userId, message } = await res.json(); // Get the userId and message from the response
+  
+        // Store userId in localStorage
+        localStorage.setItem('userId', userId);
+        
+        // Send login notification to notification service
+        const notificationData = {
+          userId: userId,
+          message: 'You have successfully logged in.',
+          type: 'login',
+        };
+  
+        // Handle notification creation
+        try {
+          const notifRes = await fetch(`http://localhost:3002/notifications`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(notificationData),
+          });
+  
+          if (!notifRes.ok) {
+            const notifError = await notifRes.json();
+            console.error('Failed to send notification:', notifError.message || 'Unknown error');
+          }
+        } catch (err) {
+          console.error('Error sending notification:', err);
+        }
+  
+        // Redirect to tasks page
+        window.location.href = 'view-tasks.html';
+      } else {
+        // If login fails, display error
+        const err = await res.json();
+        alert('Error: ' + (err.message || 'Unknown error'));
+      }
     });
   </script>
+  
 </body>
 </html>

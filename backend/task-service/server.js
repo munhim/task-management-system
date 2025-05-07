@@ -1,9 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-
 const cors = require('cors');
 
 // allow your frontend origin (or use `app.use(cors())` to allow all origins)
@@ -12,17 +10,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
 
-mongoose.connect('mongodb://localhost:27017/task-service', {
+mongoose.connect('mongodb://mongodb:27017/task-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const taskSchema = new mongoose.Schema({
-  userId: mongoose.Schema.Types.ObjectId,
+  userId: String,
   title: String,
   description: String,
   deadline: Date,
@@ -30,68 +26,73 @@ const taskSchema = new mongoose.Schema({
 });
 const Task = mongoose.model('Task', taskSchema);
 
-// auth middleware
-const auth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'Missing auth header' });
-  const token = authHeader.split(' ')[1];
-  try {
-    const { userId } = jwt.verify(token, JWT_SECRET);
-    req.userId = userId;
-    next();
-  } catch {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
+// Routes assuming userId is directly passed
 
-app.get('/tasks', auth, async (req, res) => {
-  const tasks = await Task.find({ userId: req.userId }).sort({ deadline: 1 });
-  res.json(tasks);
+app.get('/tasks', async (req, res) => {
+  const { userId } = req.query; // from query instead of req.body
+  if (!userId) return res.status(400).json({ message: 'Missing userId' });
+
+  try {
+    const tasks = await Task.find({ userId }).sort({ deadline: 1 });
+    res.json(tasks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching tasks' });
+  }
 });
 
-app.post('/tasks', auth, async (req, res) => {
-  const { title, description, deadline } = req.body;
-  if (!title || !deadline) return res.status(400).json({ message: 'Title and deadline are required' });
+
+app.post('/tasks', async (req, res) => {
+  const { userId, title, description, deadline } = req.body;
+
+  // Validate required fields
+  if (!userId || !title || !deadline) {
+    return res.status(400).json({ message: 'UserId, title, and deadline are required' });
+  }
+
   try {
     const task = new Task({
-      userId: req.userId,
+      userId,
       title,
       description,
       deadline: new Date(deadline),
     });
+
     await task.save();
-    res.json(task);
-    // notify creation
-    axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
-      userId: req.userId,
-      message: `Task created: ${title}`,
-      type: 'task_created',
-      taskId: task._id,
-    }).catch(console.error);
-    // schedule deadline reminder
+
+    // Respond immediately with the created task ID
+    res.status(201).json({ taskId: task._id });
+
+    // Schedule reminder (1 hour before deadline)
     const now = new Date();
-    const remindAt = new Date(task.deadline.getTime() - 60 * 60 * 1000);
+    const remindAt = new Date(task.deadline.getTime() - 60 * 60 * 1000); // 1 hour before deadline
     const ms = remindAt.getTime() - now.getTime();
+
     if (ms > 0) {
       setTimeout(() => {
         axios.post(`${NOTIFICATION_SERVICE_URL}/notifications`, {
-          userId: req.userId,
+          userId,
           message: `Deadline approaching for task: ${title}`,
           type: 'deadline',
           taskId: task._id,
-        }).catch(console.error);
+        }).catch(err => console.error('Notification error:', err.message));
       }, ms);
     }
+
   } catch (err) {
-    console.error(err);
+    console.error('Task creation error:', err);
     res.status(500).json({ message: 'Error creating task' });
   }
 });
 
-app.put('/tasks/:id/done', auth, async (req, res) => {
+
+app.put('/tasks/:id/done', async (req, res) => {
+  const { userId } = req.body; // Get userId from request body
+  if (!userId) return res.status(400).json({ message: 'Missing userId' });
+
   try {
     const task = await Task.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
+      { _id: req.params.id, userId },
       { status: 'done' },
       { new: true }
     );
@@ -103,9 +104,12 @@ app.put('/tasks/:id/done', auth, async (req, res) => {
   }
 });
 
-app.delete('/tasks/:id', auth, async (req, res) => {
+app.delete('/tasks/:id', async (req, res) => {
+  const { userId } = req.body; // Get userId from request body
+  if (!userId) return res.status(400).json({ message: 'Missing userId' });
+
   try {
-    const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+    const task = await Task.findOneAndDelete({ _id: req.params.id, userId });
     if (!task) return res.status(404).json({ message: 'Task not found' });
     res.json({ message: 'Task deleted' });
   } catch (err) {
