@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: task-app  # Replace with your desired namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: abdulmunhim/task-management-system-frontend:latest  # Correct image name
+          ports:
+            - containerPort: 5050  # Exposing port 5050 inside the container
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: task-app  # Replace with your desired namespace
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80          # Exposing port 80 to the outside
+      targetPort: 5050  # Mapping the external port 80 to the container's port 5050
+  type: ClusterIP      # Use LoadBalancer or NodePort if you need external access, change accordingly

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+  namespace: task-app
+data:
+  MONGO_URI_USER: mongodb://mongodb:27017/user-service
+  MONGO_URI_TASK: mongodb://mongodb:27017/task-service
+  MONGO_URI_NOTIFICATION: mongodb://mongodb:27017/notification-service
