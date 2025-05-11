@@ -68,8 +68,4 @@ kubectl apply -f k8s/
 * Add GitHub repo to ArgoCD
 * Sync Kubernetes manifests for GitOps delivery
 
-### 5. Set up Monitoring
-
-* Deploy Prometheus and Grafana using Helm
-* Import dashboards and set scrape targets
 
