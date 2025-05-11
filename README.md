@@ -38,40 +38,6 @@ This project applies modern DevOps practices to containerize and orchestrate a *
 
 
 
-##  Application Structure
-
-task-management-system/
-│
-├── backend/
-│   ├── notification-service/
-│   ├── task-service/
-│   └── user-service/
-│
-├── frontend/
-│   ├── *.html
-│   └── style.css
-│
-├── k8s/
-│   ├── configmap.yaml
-│   ├── namespace.yaml
-│   ├── user-service.yaml
-│   ├── task-service.yaml
-│   ├── notification-service.yaml
-│   ├── frontend.yaml
-│   ├── ingress.yaml
-│   └── mongo-deployment.yaml
-│
-├── Dockerfile
-├── docker-compose.yml
-├── terraform/
-│   └── main.tf (infra definitions)
-├── ansible/
-│   └── playbook.yml
-└── .github/
-    └── workflows/
-        └── ci-cd.yml
-
-
 ##. Deployment Instructions
 
 ### 1. Clone the Repository
