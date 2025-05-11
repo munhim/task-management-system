@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+# Trigger the workflow on push or pull requests to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job to build, test, and push Docker images for each service
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Step 1: Set up Node.js for user-service, task-service, notification-service
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    # Step 2: Install dependencies for each service and build Docker images
+    - name: Install dependencies and build Docker image for user-service
+      working-directory: ./user-service
+      run: |
+        npm install
+        docker build -t abdulmunhim/user-service ./user-service
+
+    - name: Install dependencies and build Docker image for task-service
+      working-directory: ./task-service
+      run: |
+        npm install
+        docker build -t abdulmunhim/task-service ./task-service
+
+    - name: Install dependencies and build Docker image for notification-service
+      working-directory: ./notification-service
+      run: |
+        npm install
+        docker build -t abdulmunhim/notification-service ./notification-service
+
+    # Step 3: Log in to DockerHub
+    - name: Log in to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Step 4: Push Docker images to DockerHub
+    - name: Push Docker image for user-service
+      run: docker push abdulmunhim/user-service
+
+    - name: Push Docker image for task-service
+      run: docker push abdulmunhim/task-service
+
+    - name: Push Docker image for notification-service
+      run: docker push abdulmunhim/notification-service
