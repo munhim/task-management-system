@@ -156,7 +156,3 @@ A microservices-based Task Management System with user authentication, task oper
 - **Aden Sial**
 
 ---
-
-## 🔄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
