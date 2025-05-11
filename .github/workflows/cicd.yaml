@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [user-service, task-service, notification-service,frontend] # removed frontend
+        service: [user-service, task-service, notification-service,frontend] # removed frontend as it's not a Dockerized service
 
     steps:
       - name: Checkout repository
@@ -29,7 +29,7 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ matrix.service }}
-          file: ./${{ matrix.service }}/Dockerfile
+          context: ./backend/${{ matrix.service }}  # Corrected the context path to include `backend`
+          file: ./backend/${{ matrix.service }}/Dockerfile  # Corrected the Dockerfile path to match each service folder
           push: true
-          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
+          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:latest
