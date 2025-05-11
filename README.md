@@ -1,3 +1,4 @@
+
 # 📝 Task Management System
 
 A microservices-based Task Management System with user authentication, task operations, notifications, and a clean web frontend. Deployed using Docker and Kubernetes, integrated with a full CI/CD pipeline via GitHub Actions.
@@ -6,27 +7,28 @@ A microservices-based Task Management System with user authentication, task oper
 
 ## 📁 Project Structure
 
+```
 .
 ├── backend/
-│ ├── user-service/ # Handles user registration and authentication
-│ ├── task-service/ # Manages tasks (CRUD operations)
-│ └── notification-service/ # Sends notifications
+│   ├── user-service/              # Handles user registration and authentication
+│   ├── task-service/              # Manages tasks (CRUD operations)
+│   └── notification-service/      # Sends notifications
 │
-├── frontend/ # HTML/CSS/JS frontend (Dockerized)
+├── frontend/                      # HTML/CSS/JS frontend (Dockerized)
 │
-├── kubernetes/ # All K8s deployment and config files
-│ ├── ingress.yaml
-│ ├── mongo-configmap.yaml
-│ ├── namespace.yaml
-│ ├── mongo-deployment.yaml
-│ ├── user-service.yaml
-│ ├── task-service.yaml
-│ ├── notification-service.yaml
-│ └── frontend.yaml
+├── kubernetes/                    # All K8s deployment and config files
+│   ├── ingress.yaml
+│   ├── mongo-configmap.yaml
+│   ├── namespace.yaml
+│   ├── mongo-deployment.yaml
+│   ├── user-service.yaml
+│   ├── task-service.yaml
+│   ├── notification-service.yaml
+│   └── frontend.yaml
 │
-├── docker-compose.yaml # Optional for local multi-service setup
-├── .github/workflows/ci-cd.yaml # GitHub Actions CI/CD pipeline
-
+├── docker-compose.yaml            # Optional for local multi-service setup
+├── .github/workflows/ci-cd.yaml   # GitHub Actions CI/CD pipeline
+```
 
 ---
 
@@ -80,70 +82,81 @@ A microservices-based Task Management System with user authentication, task oper
    ```bash
    git clone https://github.com/yourusername/task-management-system.git
    cd task-management-system
+   ```
 
-    Install dependencies for each service:
+2. Install dependencies for each service:
 
-    For user-service:
+   For **user-service**:
 
-cd backend/user-service
-npm install
+   ```bash
+   cd backend/user-service
+   npm install
+   ```
 
-For task-service:
+   For **task-service**:
 
-cd backend/task-service
-npm install
+   ```bash
+   cd backend/task-service
+   npm install
+   ```
 
-For notification-service:
+   For **notification-service**:
 
-cd backend/notification-service
-npm install
+   ```bash
+   cd backend/notification-service
+   npm install
+   ```
 
-Start the services using Docker Compose (optional):
+3. Start the services using **Docker Compose** (optional):
 
-    docker-compose up --build
+   ```bash
+   docker-compose up --build
+   ```
 
-    Open the frontend in your browser by navigating to http://localhost:3000.
+4. Open the frontend in your browser by navigating to `http://localhost:3000`.
 
-⚙️ Deployment
+---
 
-    Kubernetes Deployment:
+## ⚙️ Deployment
 
-        The project is configured to deploy on a Kubernetes cluster.
+1. **Kubernetes Deployment:**
+   - The project is configured to deploy on a Kubernetes cluster.
+   - Kubernetes manifests are located in the `kubernetes/` folder.
+   - Use `kubectl` to apply the configurations:
+   
+   ```bash
+   kubectl apply -f kubernetes/namespace.yaml
+   kubectl apply -f kubernetes/mongo-configmap.yaml
+   kubectl apply -f kubernetes/user-service.yaml
+   kubectl apply -f kubernetes/task-service.yaml
+   kubectl apply -f kubernetes/notification-service.yaml
+   kubectl apply -f kubernetes/frontend.yaml
+   ```
 
-        Kubernetes manifests are located in the kubernetes/ folder.
+2. **CI/CD Pipeline (GitHub Actions):**
+   - GitHub Actions automatically builds and pushes Docker images to Docker Hub.
+   - The workflow is defined in `.github/workflows/ci-cd.yaml`.
+   - It triggers on every push to the `main` branch.
+   - Images are tagged with `latest` and pushed to Docker Hub.
 
-        Use kubectl to apply the configurations:
+---
 
-    kubectl apply -f kubernetes/namespace.yaml
-    kubectl apply -f kubernetes/mongo-configmap.yaml
-    kubectl apply -f kubernetes/user-service.yaml
-    kubectl apply -f kubernetes/task-service.yaml
-    kubectl apply -f kubernetes/notification-service.yaml
-    kubectl apply -f kubernetes/frontend.yaml
+## 🛠️ Set Up for CI/CD Pipeline
 
-    CI/CD Pipeline (GitHub Actions):
+1. Create a `.github/workflows/ci-cd.yaml` file in your repository.
+2. Configure the Docker Hub credentials in GitHub Secrets (`DOCKER_USERNAME` and `DOCKER_PASSWORD`).
+3. The pipeline will trigger on every push to the `main` branch and push new Docker images to Docker Hub.
 
-        GitHub Actions automatically builds and pushes Docker images to Docker Hub.
+---
 
-        The workflow is defined in .github/workflows/ci-cd.yaml.
+## 🎓 Authors
 
-        It triggers on every push to the main branch.
+- **Abdul Munhim Hussain**
+- **Emaan Fatima**
+- **Aden Sial**
 
-        Images are tagged with latest and pushed to Docker Hub.
+---
 
-🛠️ Set Up for CI/CD Pipeline
+## 🔄 License
 
-    Create a .github/workflows/ci-cd.yaml file in your repository.
-
-    Configure the Docker Hub credentials in GitHub Secrets (DOCKER_USERNAME and DOCKER_PASSWORD).
-
-    The pipeline will trigger on every push to the main branch and push new Docker images to Docker Hub.
-
-🎓 Authors
-
-    Abdul Munhim Hussain
-
-    Emaan Fatima
-
-    Aden Sial
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
