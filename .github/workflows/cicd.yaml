@@ -26,19 +26,19 @@ jobs:
 
     # Step 2: Install dependencies for each service and build Docker images
     - name: Install dependencies and build Docker image for user-service
-      working-directory: ./user-service
+      working-directory: ./backend/user-service
       run: |
         npm install
         docker build -t abdulmunhim/user-service ./user-service
 
     - name: Install dependencies and build Docker image for task-service
-      working-directory: ./task-service
+      working-directory: ./backend/task-service
       run: |
         npm install
         docker build -t abdulmunhim/task-service ./task-service
 
     - name: Install dependencies and build Docker image for notification-service
-      working-directory: ./notification-service
+      working-directory: ./backend/notification-service
       run: |
         npm install
         docker build -t abdulmunhim/notification-service ./notification-service
