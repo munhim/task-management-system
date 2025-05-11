@@ -1,71 +1,149 @@
+# 📝 Task Management System
 
-# Task Management System – DevOps Project
+A microservices-based Task Management System with user authentication, task operations, notifications, and a clean web frontend. Deployed using Docker and Kubernetes, integrated with a full CI/CD pipeline via GitHub Actions.
 
-## Authors
-22i-0869
-22i-1313
-22i-1021
+---
 
-## Overview
+## 📁 Project Structure
 
-This project applies modern DevOps practices to containerize and orchestrate a **Task Management System** using Docker, Kubernetes, CI/CD pipelines, infrastructure automation, monitoring, and GitOps tools.
-
-##  Team & Work Distribution
-
-| Member Name     | Responsibilities                                             |
-| --------------- | ------------------------------------------------------------ |
-| Member 1 (Lead) | Dockerization, Kubernetes manifests, GitHub repo setup       |
-| Member 2        | Ingress setup, ConfigMaps/Secrets, CI/CD with GitHub Actions |
-| Member 3        | Terraform IaC for Kubernetes cluster setup                   |
-
-
-
-
-##  Tools & Technologies
-
-| Tool                | Purpose                                        |
-| ------------------- | ---------------------------------------------- |
-| GitHub              | Code repository and version control            |
-| Dockerfile          | Containerizing microservices                   |
-| Kubernetes          | Orchestration (deployments, services, ingress) |
-| ConfigMap & Secrets | Configuration and sensitive data               |
-| Terraform           | Infrastructure provisioning                    |
-| Ansible             | Configuration management & app deployment      |
-| GitHub Actions      | CI/CD pipelines                                |
-| ArgoCD              | GitOps for deployment                          |
-| Prometheus          | Monitoring                                     |
-| Grafana             | Visualization & Dashboards                     |
+.
+├── backend/
+│ ├── user-service/ # Handles user registration and authentication
+│ ├── task-service/ # Manages tasks (CRUD operations)
+│ └── notification-service/ # Sends notifications
+│
+├── frontend/ # HTML/CSS/JS frontend (Dockerized)
+│
+├── kubernetes/ # All K8s deployment and config files
+│ ├── ingress.yaml
+│ ├── mongo-configmap.yaml
+│ ├── namespace.yaml
+│ ├── mongo-deployment.yaml
+│ ├── user-service.yaml
+│ ├── task-service.yaml
+│ ├── notification-service.yaml
+│ └── frontend.yaml
+│
+├── docker-compose.yaml # Optional for local multi-service setup
+├── .github/workflows/ci-cd.yaml # GitHub Actions CI/CD pipeline
 
 
+---
 
-##. Deployment Instructions
+## 🚀 Features
 
-### 1. Clone the Repository
+- 📦 Microservices-based architecture using **Node.js**
+- 🌐 Clean **HTML/CSS/JS frontend**
+- 🐳 Dockerized services
+- ☸️ Kubernetes deployment
+- 🔐 MongoDB database integration
+- 🔄 GitHub Actions for CI/CD (build, test, push images)
+- 🚢 ArgoCD for GitOps-style Kubernetes deployment
 
+---
 
-git clone https://github.com/munhim/task-management-system.git
-cd task-management-system
+## ⚙️ Microservices Overview
 
-### 2. Dockerize and Push Images
+### 1. User Service
+- REST APIs for user registration, login, and authentication.
+- Interacts with MongoDB for storing user data.
 
+### 2. Task Service
+- Handles CRUD operations for tasks.
+- Allows users to create, view, update, and delete tasks.
 
-docker build -t user-service ./backend/user-service
-docker build -t task-service ./backend/task-service
-docker build -t notification-service ./backend/notification-service
-docker build -t frontend ./frontend
-docker push <your-dockerhub-username>/user-service
-# Repeat for others
+### 3. Notification Service
+- Sends notifications to users regarding their tasks.
 
+### 4. Frontend
+- Clean UI built using HTML, CSS, and JavaScript.
+- Interacts with backend services via API calls.
 
-### 3. Apply Kubernetes Resources
+---
 
+## 🛠️ Technologies Used
 
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/
+- **Node.js** for backend services.
+- **MongoDB** for database.
+- **Docker** for containerization of services.
+- **Kubernetes** for orchestration and deployment.
+- **GitHub Actions** for CI/CD pipeline automation.
+- **ArgoCD** for GitOps-based deployment.
+- **Docker Compose** for local multi-service setup.
 
-### 4. Configure ArgoCD
+---
 
-* Add GitHub repo to ArgoCD
-* Sync Kubernetes manifests for GitOps delivery
+## 📝 How to Run Locally
 
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/task-management-system.git
+   cd task-management-system
+
+    Install dependencies for each service:
+
+    For user-service:
+
+cd backend/user-service
+npm install
+
+For task-service:
+
+cd backend/task-service
+npm install
+
+For notification-service:
+
+cd backend/notification-service
+npm install
+
+Start the services using Docker Compose (optional):
+
+    docker-compose up --build
+
+    Open the frontend in your browser by navigating to http://localhost:3000.
+
+⚙️ Deployment
+
+    Kubernetes Deployment:
+
+        The project is configured to deploy on a Kubernetes cluster.
+
+        Kubernetes manifests are located in the kubernetes/ folder.
+
+        Use kubectl to apply the configurations:
+
+    kubectl apply -f kubernetes/namespace.yaml
+    kubectl apply -f kubernetes/mongo-configmap.yaml
+    kubectl apply -f kubernetes/user-service.yaml
+    kubectl apply -f kubernetes/task-service.yaml
+    kubectl apply -f kubernetes/notification-service.yaml
+    kubectl apply -f kubernetes/frontend.yaml
+
+    CI/CD Pipeline (GitHub Actions):
+
+        GitHub Actions automatically builds and pushes Docker images to Docker Hub.
+
+        The workflow is defined in .github/workflows/ci-cd.yaml.
+
+        It triggers on every push to the main branch.
+
+        Images are tagged with latest and pushed to Docker Hub.
+
+🛠️ Set Up for CI/CD Pipeline
+
+    Create a .github/workflows/ci-cd.yaml file in your repository.
+
+    Configure the Docker Hub credentials in GitHub Secrets (DOCKER_USERNAME and DOCKER_PASSWORD).
+
+    The pipeline will trigger on every push to the main branch and push new Docker images to Docker Hub.
+
+🎓 Authors
+
+    Abdul Munhim Hussain
+
+    Emaan Fatima
+
+    Aden Sial
 
