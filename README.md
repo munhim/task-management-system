@@ -43,7 +43,7 @@ This project applies modern DevOps practices to containerize and orchestrate a *
 ### 1. Clone the Repository
 
 
-git clone https://github.com/your-org/task-management-system.git
+git clone https://github.com/munhim/task-management-system.git
 cd task-management-system
 
 ### 2. Dockerize and Push Images
@@ -57,7 +57,7 @@ docker push <your-dockerhub-username>/user-service
 # Repeat for others
 
 
-### 3. ☸Apply Kubernetes Resources
+### 3. Apply Kubernetes Resources
 
 
 kubectl apply -f k8s/namespace.yaml
