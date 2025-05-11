@@ -29,19 +29,19 @@ jobs:
       working-directory: ./backend/user-service
       run: |
         npm install
-        docker build -t abdulmunhim/user-service ./user-service
+        docker build -t abdulmunhim/user-service ./backend/user-service
 
     - name: Install dependencies and build Docker image for task-service
       working-directory: ./backend/task-service
       run: |
         npm install
-        docker build -t abdulmunhim/task-service ./task-service
+        docker build -t abdulmunhim/task-service ./backend/task-service
 
     - name: Install dependencies and build Docker image for notification-service
       working-directory: ./backend/notification-service
       run: |
         npm install
-        docker build -t abdulmunhim/notification-service ./notification-service
+        docker build -t abdulmunhim/notification-service ./backend/notification-service
 
     # Step 3: Log in to DockerHub
     - name: Log in to DockerHub
