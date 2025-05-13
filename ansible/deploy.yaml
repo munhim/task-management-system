@@ -1,0 +1,89 @@
+- name: Deploy Task Management App using Docker Compose
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install dependencies
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+        state: present
+        update_cache: true
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create app directory
+      file:
+        path: /home/ubuntu/task-management-system
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Copy docker-compose.yml to EC2
+      copy:
+        src: /mnt/c/Users/Munhim/Desktop/task-management-system/docker-compose.yml  # Absolute path to docker-compose.yml
+        dest: /home/ubuntu/task-management-system/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Copy backend directory to EC2
+      ansible.builtin.synchronize:
+        src: /mnt/c/Users/Munhim/Desktop/task-management-system/backend/
+        dest: /home/ubuntu/task-management-system/backend/
+        mode: push
+        recursive: yes
+
+    - name: Set ownership of the backend directory
+      ansible.builtin.file:
+        path: /home/ubuntu/task-management-system/backend/
+        owner: ubuntu
+        group: ubuntu
+        recurse: yes
+
+
+    - name: Copy frontend directory to EC2
+      ansible.builtin.synchronize:
+        src: /mnt/c/Users/Munhim/Desktop/task-management-system/frontend/
+        dest: /home/ubuntu/task-management-system/frontend/
+        mode: push
+        recursive: yes
+
+    - name: Set ownership of the frontend directory
+      ansible.builtin.file:
+        path: /home/ubuntu/task-management-system/frontend/
+        owner: ubuntu
+        group: ubuntu
+        recurse: yes
+
+
+    - name: Run Docker Compose
+      shell: docker-compose up -d
+      args:
+        chdir: /home/ubuntu/task-management-system
