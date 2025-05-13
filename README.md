@@ -1,7 +1,6 @@
-
 # 📝 Task Management System
 
-A microservices-based Task Management System with user authentication, task operations, notifications, and a clean web frontend. Deployed using Docker and Kubernetes, integrated with a full CI/CD pipeline via GitHub Actions.
+A microservices-based Task Management System with user authentication, task operations, notifications, and a clean web frontend. Deployed using Docker, Kubernetes, and managed infrastructure provisioning via Terraform, integrated with a full CI/CD pipeline via GitHub Actions.
 
 ---
 
@@ -16,7 +15,7 @@ A microservices-based Task Management System with user authentication, task oper
 │
 ├── frontend/                      # HTML/CSS/JS frontend (Dockerized)
 │
-├── kubernetes/                    # All K8s deployment and config files
+├── kubernetes/                    # Raw Kubernetes manifests (optional reference)
 │   ├── ingress.yaml
 │   ├── mongo-configmap.yaml
 │   ├── namespace.yaml
@@ -26,56 +25,129 @@ A microservices-based Task Management System with user authentication, task oper
 │   ├── notification-service.yaml
 │   └── frontend.yaml
 │
+├── terraform/                     # Terraform configurations to manage K8s resources
+│   ├── provider.tf                # Kubernetes provider setup
+│   ├── namespace.tf               # Namespace resource
+│   ├── configmap.tf               # MongoDB ConfigMap
+│   ├── mongodb.tf                 # MongoDB Deployment & Service
+│   ├── frontend.tf                # Frontend Deployment & Service
+│   ├── notification.tf            # Notification Service Deployment & Service
+│   ├── task_service.tf            # Task Service Deployment & Service
+│   └── user_service.tf            # User Service Deployment & Service
+│
 ├── docker-compose.yaml            # Optional for local multi-service setup
 ├── .github/workflows/ci-cd.yaml   # GitHub Actions CI/CD pipeline
+└── README.md                      # Project overview and instructions
 ```
 
 ---
 
 ## 🚀 Features
 
-- 📦 Microservices-based architecture using **Node.js**
-- 🌐 Clean **HTML/CSS/JS frontend**
-- 🐳 Dockerized services
-- ☸️ Kubernetes deployment
-- 🔐 MongoDB database integration
-- 🔄 GitHub Actions for CI/CD (build, test, push images)
-- 🚢 ArgoCD for GitOps-style Kubernetes deployment
+* 📦 Microservices-based architecture using **Node.js**
+* 🌐 Clean **HTML/CSS/JS frontend**
+* 🐳 Dockerized services
+* ☸️ Kubernetes orchestration
+* 🔧 Infrastructure as Code via **Terraform**
+* 🔐 MongoDB database integration
+* 🔄 GitHub Actions for CI/CD (build, test, push images)
 
 ---
 
 ## ⚙️ Microservices Overview
 
 ### 1. User Service
-- REST APIs for user registration, login, and authentication.
-- Interacts with MongoDB for storing user data.
+
+* REST APIs for user registration, login, and authentication.
+* Interacts with MongoDB for storing user data.
 
 ### 2. Task Service
-- Handles CRUD operations for tasks.
-- Allows users to create, view, update, and delete tasks.
+
+* Handles CRUD operations for tasks.
+* Allows users to create, view, update, and delete tasks.
 
 ### 3. Notification Service
-- Sends notifications to users regarding their tasks.
+
+* Sends notifications to users regarding their tasks.
 
 ### 4. Frontend
-- Clean UI built using HTML, CSS, and JavaScript.
-- Interacts with backend services via API calls.
+
+* Clean UI built using HTML, CSS, and JavaScript.
+* Interacts with backend services via API calls.
 
 ---
 
 ## 🛠️ Technologies Used
 
-- **Node.js** for backend services.
-- **MongoDB** for database.
-- **Docker** for containerization of services.
-- **Kubernetes** for orchestration and deployment.
-- **GitHub Actions** for CI/CD pipeline automation.
-- **ArgoCD** for GitOps-based deployment.
-- **Docker Compose** for local multi-service setup.
+* **Node.js** for backend services
+* **MongoDB** for database
+* **Docker** for containerization of services
+* **Kubernetes** for orchestration and deployment
+* **Terraform** for Kubernetes resource management
+* **GitHub Actions** for CI/CD pipeline automation
+* **Docker Compose** for local multi-service setup
 
 ---
 
-## 📝 How to Run Locally
+## 🔧 Terraform Setup
+
+All Kubernetes resources are managed through Terraform in the `terraform/` directory. Follow these steps to provision your cluster resources:
+
+1. **Initialize Terraform**
+
+   ```bash
+   cd terraform
+   terraform init
+   ```
+
+2. **Review Plan**
+
+   ```bash
+   terraform plan
+   ```
+
+3. **Apply Configuration**
+
+   ```bash
+   terraform apply
+   ```
+
+   Confirm with `yes` when prompted.
+
+4. **Import Existing Resources (if needed)**
+   If resources already exist in the cluster, import them to Terraform state:
+
+   ```bash
+   # Namespace
+   terraform import kubernetes_namespace.task_app task-app
+
+   # ConfigMap
+   terraform import kubernetes_config_map.mongo_config task-app/mongo-config
+
+   # MongoDB
+   terraform import kubernetes_deployment.mongodb task-app/mongodb
+   terraform import kubernetes_service.mongodb task-app/mongodb
+
+   # Frontend
+   terraform import kubernetes_deployment.frontend task-app/frontend
+   terraform import kubernetes_service.frontend task-app/frontend
+
+   # Notification Service
+   terraform import kubernetes_deployment.notification_service task-app/notification-service
+   terraform import kubernetes_service.notification_service task-app/notification-service
+
+   # Task Service
+   terraform import kubernetes_deployment.task_service task-app/task-service
+   terraform import kubernetes_service.task_service task-app/task-service
+
+   # User Service
+   terraform import kubernetes_deployment.user_service task-app/user-service
+   terraform import kubernetes_service.user_service task-app/user-service
+   ```
+
+---
+
+## 📝 Running Locally
 
 1. Clone the repository:
 
@@ -86,73 +158,24 @@ A microservices-based Task Management System with user authentication, task oper
 
 2. Install dependencies for each service:
 
-   For **user-service**:
-
    ```bash
-   cd backend/user-service
-   npm install
+   cd backend/user-service && npm install
+   cd ../task-service && npm install
+   cd ../notification-service && npm install
    ```
 
-   For **task-service**:
-
-   ```bash
-   cd backend/task-service
-   npm install
-   ```
-
-   For **notification-service**:
-
-   ```bash
-   cd backend/notification-service
-   npm install
-   ```
-
-3. Start the services using **Docker Compose** (optional):
+3. Start with Docker Compose (optional):
 
    ```bash
    docker-compose up --build
    ```
 
-4. Open the frontend in your browser by navigating to `http://localhost:3000`.
-
----
-
-## ⚙️ Deployment
-
-1. **Kubernetes Deployment:**
-   - The project is configured to deploy on a Kubernetes cluster.
-   - Kubernetes manifests are located in the `kubernetes/` folder.
-   - Use `kubectl` to apply the configurations:
-   
-   ```bash
-   kubectl apply -f kubernetes/namespace.yaml
-   kubectl apply -f kubernetes/mongo-configmap.yaml
-   kubectl apply -f kubernetes/user-service.yaml
-   kubectl apply -f kubernetes/task-service.yaml
-   kubectl apply -f kubernetes/notification-service.yaml
-   kubectl apply -f kubernetes/frontend.yaml
-   ```
-
-2. **CI/CD Pipeline (GitHub Actions):**
-   - GitHub Actions automatically builds and pushes Docker images to Docker Hub.
-   - The workflow is defined in `.github/workflows/ci-cd.yaml`.
-   - It triggers on every push to the `main` branch.
-   - Images are tagged with `latest` and pushed to Docker Hub.
-
----
-
-## 🛠️ Set Up for CI/CD Pipeline
-
-1. Create a `.github/workflows/ci-cd.yaml` file in your repository.
-2. Configure the Docker Hub credentials in GitHub Secrets (`DOCKER_USERNAME` and `DOCKER_PASSWORD`).
-3. The pipeline will trigger on every push to the `main` branch and push new Docker images to Docker Hub.
+4. Access the frontend at `http://localhost:3000`
 
 ---
 
 ## 🎓 Authors
 
-- **Abdul Munhim Hussain**
-- **Emaan Fatima**
-- **Aden Sial**
-
----
+* **Abdul Munhim Hussain**
+* **Emaan Fatima**
+* **Aden Sial**
