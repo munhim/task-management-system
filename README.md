@@ -15,16 +15,16 @@ A microservices-based Task Management System with user authentication, task oper
 │
 ├── frontend/                      # HTML/CSS/JS frontend (Dockerized)
 │
-├── kubernetes/                    # Raw Kubernetes manifests (optional reference)
-│   ├── ingress.yaml
-│   ├── mongo-configmap.yaml
-│   ├── namespace.yaml
-│   ├── mongo-deployment.yaml
-│   ├── user-service.yaml
-│   ├── task-service.yaml
-│   ├── notification-service.yaml
+├── k8s/                         # Raw Kubernetes manifests (optional reference)
+│   ├── ingress.yaml                 # Defines Ingress rules for routing
+│   ├── mongo-configmap.yaml         # ConfigMap for MongoDB URIs
+│   ├── namespace.yaml               # Namespace definition for task-app
+│   ├── mongo-deployment.yaml        # MongoDB Deployment and Service definitions
+│   ├── user-service.yaml            # Deployment and Service for User Service
+│   ├── task-service.yaml            # Deployment and Service for Task Service
+│   ├── notification-service.yaml    # Deployment and Service for Notification Service
 │   └── frontend.yaml
-│
+|             
 ├── terraform/                     # Terraform configurations to manage K8s resources
 │   ├── provider.tf                # Kubernetes provider setup
 │   ├── namespace.tf               # Namespace resource
@@ -173,6 +173,22 @@ All Kubernetes resources are managed through Terraform in the `terraform/` direc
 4. Access the frontend at `http://localhost:3000`
 
 ---
+
+---
+
+## ☸️ Kubernetes Deployment
+
+Apply the raw Kubernetes manifests (in the `k8s/` folder) using `kubectl`:
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/mongo-configmap.yaml
+kubectl apply -f k8s/mongo-deployment.yaml
+kubectl apply -f k8s/user-service.yaml
+kubectl apply -f k8s/task-service.yaml
+kubectl apply -f k8s/notification-service.yaml
+kubectl apply -f k8s/frontend.yaml
+```
 
 ## 🎓 Authors
 
