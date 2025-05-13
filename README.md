@@ -170,7 +170,7 @@ All Kubernetes resources are managed through Terraform in the `terraform/` direc
    docker-compose up --build
    ```
 
-4. Access the frontend at `http://localhost:3000`
+4. Access the frontend at `http://localhost:5050`
 
 ---
 
