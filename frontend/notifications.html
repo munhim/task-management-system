@@ -18,7 +18,7 @@
   <script>
     const userId = localStorage.getItem('userId');
     async function loadNotifs() {
-      const res = await fetch(`http://localhost:3002/notifications?userId=${userId}`);
+      const res = await fetch(`http://54.210.105.189:3002/notifications?userId=${userId}`);
       if (!res.ok) {
         alert('Failed to load notifications');
         return;
