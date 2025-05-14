@@ -45,7 +45,7 @@
   
       const payload = { userId, title, description, deadline };
   
-      const res = await fetch('http://54.210.105.189:3001/tasks', {
+      const res = await fetch('http://3.86.146.163:3001/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -60,7 +60,7 @@
 
       const moni=res.json();
   
-      await fetch('http://54.210.105.189:3002/notifications', {
+      await fetch('http://3.86.146.163:3002/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

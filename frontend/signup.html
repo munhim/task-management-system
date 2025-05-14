@@ -34,7 +34,7 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
-      const res = await fetch('http://54.210.105.189:3000/signup', {
+      const res = await fetch('http://3.86.146.163:3000/signup', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify(data)
       });

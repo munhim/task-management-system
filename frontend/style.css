@@ -22,7 +22,7 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding: 30px 16px;
 }
 
@@ -150,6 +150,15 @@ button:active {
   transform: translateY(1px);
 }
 
+/* Task List Wrapper */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
 /* Tasks */
 
 .task-item {
@@ -159,7 +168,8 @@ button:active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  width: 100%;
+  max-width: 600px;
   box-shadow: var(--shadow);
 }
 
@@ -191,13 +201,18 @@ button:active {
   transform: translateY(1px);
 }
 
-/* Notifications */
+/* Notification List Wrapper */
 
 .notification-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   gap: 16px;
+  margin-bottom: 32px;
 }
+
+/* Notifications */
 
 .notification-item {
   background: red;
@@ -207,9 +222,13 @@ button:active {
   border: 1px solid #444;
   box-shadow: var(--shadow);
   cursor: pointer;
-  max-width: 100%;
-  transition: background 0.3s, transform 0.2s;
   word-break: break-word;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+
+  flex: 0 1 260px;
+  max-width: 300px;
+  min-width: 200px;
+  text-align: center;
 }
 
 .notification-item:hover {
@@ -220,6 +239,32 @@ button:active {
 
 .notification-item.clicked {
   background: green;
+}
+
+/* Clear Button */
+
+.clear-btn {
+  background-color: #757575;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+.clear-btn:hover {
+  background-color: #9e9e9e;
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
+}
+
+.clear-btn:active {
+  transform: translateY(1px);
 }
 
 /* Responsive */
@@ -241,5 +286,11 @@ button:active {
   nav a {
     width: 100%;
     text-align: center;
+  }
+
+  .task-item,
+  .notification-item {
+    width: 100%;
+    max-width: 100%;
   }
 }
