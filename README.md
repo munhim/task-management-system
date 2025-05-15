@@ -276,7 +276,7 @@ To run GitHub Actions workflows on your own Windows machine, follow these steps 
 2. **Open PowerShell and navigate to your runner directory:**
 
    ```powershell
-   cd "C:\Users\Munhim\Desktop\task-management-system\actions-runner"
+   cd "C:\Users\Munhim\Desktop\actions-runner"
    ```
 
 3. **Download the latest runner package:**
