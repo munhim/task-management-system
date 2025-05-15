@@ -17,7 +17,7 @@ spec:
         - name: frontend
           image: abdulmunhim/task-management-system-frontend:latest  # Correct image name
           ports:
-            - containerPort: 5050  # Exposing port 5050 inside the container
+            - containerPort: 80  # Exposing port 5050 inside the container
 ---
 apiVersion: v1
 kind: Service
@@ -30,5 +30,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80          # Exposing port 80 to the outside
-      targetPort: 5050  # Mapping the external port 80 to the container's port 5050
+      targetPort: 80  # Mapping the external port 80 to the container's port 5050
   type: ClusterIP      # Use LoadBalancer or NodePort if you need external access, change accordingly
