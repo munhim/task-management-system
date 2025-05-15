@@ -49,7 +49,7 @@ A microservices-based Task Management System with user authentication, task oper
 ## 🚀 Features
 
 * 📦 Microservices-based architecture using **Node.js**
-* 🌐 Clean **HTML/CSS/JS frontend**
+* 🌐 Clean **HTML/CSS/JS frontend files**
 * 🐳 Dockerized services
 * ☸️ Kubernetes orchestration
 * 🔧 Infrastructure as Code via **Terraform**
