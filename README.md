@@ -262,6 +262,65 @@ You can configure GitHub Actions to call ArgoCD API or CLI to automatically sync
 
 ---
 
+Got it! Here's your **updated README snippet** to add **the self-hosted GitHub Actions runner setup commands** under a new section called **"Self-hosted Runner Setup (Windows PowerShell)"** in the README. I included your full commands with some formatting and notes for clarity and ease of copy-pasting:
+
+---
+
+## 🤖 Self-hosted Runner Setup (Windows PowerShell)
+
+To run GitHub Actions workflows on your own Windows machine, follow these steps to install and configure the self-hosted runner:
+
+1. **(Optional) Install latest PowerShell for new features:**
+   [https://aka.ms/PSWindows](https://aka.ms/PSWindows)
+
+2. **Open PowerShell and navigate to your runner directory:**
+
+   ```powershell
+   cd "C:\Users\Munhim\Desktop\task-management-system\actions-runner"
+   ```
+
+3. **Download the latest runner package:**
+
+   ```powershell
+   Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v2.323.0/actions-runner-win-x64-2.323.0.zip -OutFile actions-runner-win-x64-2.323.0.zip
+   ```
+
+4. **Extract the runner archive:**
+
+   ```powershell
+   Add-Type -AssemblyName System.IO.Compression.FileSystem
+   [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\actions-runner-win-x64-2.323.0.zip", "$PWD")
+   ```
+
+5. **Configure the runner (replace URL and token accordingly):**
+
+   ```powershell
+   .\config.cmd --url https://github.com/munhim/task-management-system --token BM7RDDK52WUO67NT5RZFQP3IEZL7C
+   ```
+
+   During configuration, follow the prompts:
+
+   * Runner group: press Enter for default
+   * Runner name: press Enter or specify (e.g., MUNHIM)
+   * Additional labels: press Enter to skip
+   * Work folder: press Enter for default `_work`
+   * Run as service: enter `y` for yes
+   * User account for service: press Enter for default `NT AUTHORITY\NETWORK SERVICE`
+
+6. **Start the runner manually if service fails to start:**
+
+   ```powershell
+   .\run.cmd
+   ```
+
+   You should see logs indicating the runner is connected and listening for jobs.
+
+---
+
+**Note:** If the service installation fails or does not start properly, running `.\run.cmd` manually will keep the runner active.
+
+---
+
 ## 🎓 Authors
 
 * **Abdul Munhim Hussain**
