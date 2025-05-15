@@ -12,6 +12,10 @@ A microservices-based Task Management System with user authentication, task oper
 
 ```
 .
+├── ansible/                      # Ansible deployment configuration
+│   ├── deploy.yml                # Ansible playbook to deploy the app
+│   └── inventory.ini             # Inventory file specifying remote hosts
+│
 ├── backend/
 │   ├── user-service/              # Handles user registration and authentication
 │   ├── task-service/              # Manages tasks (CRUD operations)
@@ -19,29 +23,30 @@ A microservices-based Task Management System with user authentication, task oper
 │
 ├── frontend/                      # HTML/CSS/JS frontend (Dockerized)
 │
-├── k8s/                         # Raw Kubernetes manifests (optional reference)
-│   ├── ingress.yaml                 # Defines Ingress rules for routing
-│   ├── mongo-configmap.yaml         # ConfigMap for MongoDB URIs
-│   ├── namespace.yaml               # Namespace definition for task-app
-│   ├── mongo-deployment.yaml        # MongoDB Deployment and Service definitions
-│   ├── user-service.yaml            # Deployment and Service for User Service
-│   ├── task-service.yaml            # Deployment and Service for Task Service
-│   ├── notification-service.yaml    # Deployment and Service for Notification Service
+├── k8s/                           # Raw Kubernetes manifests (optional reference)
+│   ├── ingress.yaml
+│   ├── mongo-configmap.yaml
+│   ├── namespace.yaml
+│   ├── mongo-deployment.yaml
+│   ├── user-service.yaml
+│   ├── task-service.yaml
+│   ├── notification-service.yaml
 │   └── frontend.yaml
-|             
-├── terraform/                     # Terraform configurations to manage K8s resources
-│   ├── provider.tf                # Kubernetes provider setup
-│   ├── namespace.tf               # Namespace resource
-│   ├── configmap.tf               # MongoDB ConfigMap
-│   ├── mongodb.tf                 # MongoDB Deployment & Service
-│   ├── frontend.tf                # Frontend Deployment & Service
-│   ├── notification.tf            # Notification Service Deployment & Service
-│   ├── task_service.tf            # Task Service Deployment & Service
-│   └── user_service.tf            # User Service Deployment & Service
+│             
+├── terraform/                    # Terraform configurations to manage K8s resources
+│   ├── provider.tf
+│   ├── namespace.tf
+│   ├── configmap.tf
+│   ├── mongodb.tf
+│   ├── frontend.tf
+│   ├── notification.tf
+│   ├── task_service.tf
+│   └── user_service.tf
 │
-├── docker-compose.yaml            # Optional for local multi-service setup
-├── .github/workflows/ci-cd.yaml   # GitHub Actions CI/CD pipeline
-└── README.md                      # Project overview and instructions
+├── docker-compose.yaml           # Optional for local multi-service setup
+├── .github/workflows/ci-cd.yaml  # GitHub Actions CI/CD pipeline
+└── README.md                     # Project overview and instructions
+
 ```
 
 ---
@@ -194,6 +199,40 @@ kubectl apply -f k8s/task-service.yaml
 kubectl apply -f k8s/notification-service.yaml
 kubectl apply -f k8s/frontend.yaml
 ```
+
+---
+
+## 🚀 Ansible Setup for Deployment
+
+Here's a brief summary of the Ansible setup for deploying to an EC2 instance:
+
+1. **Provision EC2 Instance:**
+
+   * Create an EC2 instance manually or via IaC (Terraform/CloudFormation).
+   * Generate an SSH key pair and keep the private key locally.
+
+2. **Configure Security:**
+
+   * Add inbound rules to allow SSH (port 22) and any other required ports (e.g., HTTP/HTTPS).
+
+3. **Prepare Ansible Inventory:**
+
+   * Create an `inventory.ini` file listing your EC2 instance IP and SSH details for Ansible to connect.
+
+4. **Write Ansible Playbook:**
+
+   * Define tasks to install dependencies, configure services, deploy your app, etc., in `deploy.yaml`.
+
+5. **Run Playbook:**
+
+   * Use `ansible-playbook -i inventory.ini deploy.yaml` to connect to the EC2 instance and execute deployment steps.
+
+6. **GitOps Integration (Optional):**
+
+   * Use ArgoCD to watch your Git repo and automatically sync Kubernetes manifests for continuous deployment.
+
+---
+
 
 ---
 
