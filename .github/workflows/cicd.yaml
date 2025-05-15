@@ -7,12 +7,17 @@ on:
 jobs:
   build-and-push:
     name: Build & Push Docker Images
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # <-- Use your self-hosted runner here
 
     strategy:
       matrix:
-        service_name: [user-service, task-service, notification-service]
-        image_name: [task-management-user-service, task-management-task-service, task-management-notification-service]
+        include:
+          - service_name: user-service
+            image_name: task-management-user-service
+          - service_name: task-service
+            image_name: task-management-task-service
+          - service_name: notification-service
+            image_name: task-management-notification-service
 
     steps:
       - name: Checkout repository
@@ -33,11 +38,11 @@ jobs:
           context: ./backend/${{ matrix.service_name }}
           file: ./backend/${{ matrix.service_name }}/Dockerfile
           push: true
-          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/task-management-${{ matrix.service_name }}:latest
+          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ matrix.image_name }}:latest
 
   build-and-push-frontend:
     name: Build & Push Frontend Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted   # <-- Use your self-hosted runner here
 
     steps:
       - name: Checkout repository
